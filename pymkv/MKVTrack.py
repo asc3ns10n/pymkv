@@ -63,11 +63,12 @@ class MKVTrack:
         The name that will be given to the track when muxed into a file.
     language : str, optional
         The language of the track. It must be an ISO639-2 language code.
+    sync: int, optional
+        Adjust the timestamps of the track in milliseconds.
     default_track : bool, optional
         Determines if the track should be the default track of its type when muxed into an MKV file.
     forced_track : bool, optional
         Determines if the track should be a forced track when muxed into an MKV file.
-
     Attributes
     ----------
     mkvmerge_path : str
@@ -98,7 +99,7 @@ class MKVTrack:
         that are already part of an MKV file.
     """
 
-    def __init__(self, file_path, track_id=0, track_name=None, language=None, default_track=False, forced_track=False):
+    def __init__(self, file_path, track_id=0, track_name=None, language=None, sync=0, default_track=False, forced_track=False):
         # track info
         self._track_codec = None
         self._track_type = None
@@ -117,7 +118,9 @@ class MKVTrack:
         self._tags = None
         self.default_track = default_track
         self.forced_track = forced_track
-
+        self._sync = None
+        self.sync = sync
+        
         # exclusions
         self.no_chapters = False
         self.no_global_tags = False
@@ -216,6 +219,15 @@ class MKVTrack:
         if not isfile(file_path):
             raise FileNotFoundError('"{}" does not exist'.format(file_path))
         self._tags = file_path
+
+    @property
+    def sync(self):
+        """int: Adjust the timestamps of the track in milliseconds."""
+        return self._sync
+
+    @sync.setter
+    def sync(self, sync):
+        self._sync = sync
 
     @property
     def track_codec(self):
